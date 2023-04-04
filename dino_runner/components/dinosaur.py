@@ -23,6 +23,8 @@ class Dinosaur(Sprite):
 
         if self.in_jump:
             self.jump()
+            if user_input[pygame.K_DOWN]:
+                self.jump_speed += 1
         else:
             self.dino_rect_y = self.Y_POS + (user_input[pygame.K_DOWN] * 40)
 
@@ -55,5 +57,5 @@ class Dinosaur(Sprite):
         self.dino_rect.y = self.dino_rect_y + 15
         self.dino_rect.x = self.dino_rect_x + 20
         self.dino_rect.w -= 40
-        self.dino_rect.h -= 30
-        #screen.fill((255, 0, 255), self.dino_rect)
+        self.dino_rect.h -= 40
+        screen.fill((255, 0, 255), self.dino_rect)

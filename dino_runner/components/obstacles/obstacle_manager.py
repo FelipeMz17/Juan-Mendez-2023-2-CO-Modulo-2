@@ -2,7 +2,8 @@ import pygame
 import random
 
 from dino_runner.components.obstacles.cactus import Cactus
-from dino_runner.utils.constants import SMALL_CACTUS
+from dino_runner.components.obstacles.bird import Bird
+from dino_runner.utils.constants import SMALL_CACTUS, LARGE_CACTUS, BIRD
 
 class ObstacleManager:
     def __init__(self):
@@ -10,14 +11,13 @@ class ObstacleManager:
         self.counter = 100
     
     def generate_obstacle(self):
-        obstacle = Cactus(SMALL_CACTUS)
+        obstacle = random.choice([Cactus(random.choice([SMALL_CACTUS, LARGE_CACTUS])), Bird(BIRD)])
         return obstacle
     
     def update(self, game):
         self.counter += 1
         if self.counter > 60:
-            self.counter = random.randint(0, 30)
-            print(self.counter)
+            self.counter = random.randint(0, 40)
             obstacle = self.generate_obstacle()
             self.obstacles.append(obstacle)
         
