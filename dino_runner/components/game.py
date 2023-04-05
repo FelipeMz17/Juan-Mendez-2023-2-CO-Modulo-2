@@ -24,6 +24,7 @@ class Game:
         self.running = False
         self.death_count = 0
         self.score = 0
+        self.highest_score = 0
 
     def execute(self):
         self.running = True
@@ -80,11 +81,13 @@ class Game:
         half_screen_height = SCREEN_HEIGHT // 2
         self.menu.reset_screen_color(self.screen)
 
-        if self.death_count == 0:
-            self.menu.draw(self.screen)
-        else:
-            self.menu.update_message('Press any key to continue')
-            self.menu.draw(self.screen)
+        if self.death_count > 0:
+            self.highest_score = self.score if self.highest_score < self.score else self.highest_score
+            self.menu.show_status(self.score, self.highest_score, self.death_count, self.screen)
+            self.menu.update_message(f'Game over. Press any key to restart.')
+        
+        self.menu.draw(self.screen)    
+            
         self.screen.blit(ICON, (half_screen_width - 50, half_screen_height - 140))
         self.menu.update(self)
     
