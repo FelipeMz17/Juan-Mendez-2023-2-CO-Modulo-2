@@ -4,7 +4,7 @@ import random
 from dino_runner.components.obstacles.cactus import Cactus
 from dino_runner.components.obstacles.bird import Bird
 from dino_runner.components.obstacles.cloud import Cloud
-from dino_runner.utils.constants import SMALL_CACTUS, LARGE_CACTUS, BIRD, CLOUD, SHIELD_TYPE
+from dino_runner.utils.constants import SMALL_CACTUS, LARGE_CACTUS, BIRD, CLOUD, SHIELD_TYPE, DINO_DEAD
 
 class ObstacleManager:
     def __init__(self):
@@ -33,15 +33,24 @@ class ObstacleManager:
         #colision de obstaculos con el player
         for obstacle in self.obstacles:
             obstacle.update(game.game_speed, self.obstacles)
+            #verificar colision con el jugador
             if game.player.dino_rect.colliderect(obstacle.rect):
+                # GAME OVER
                 if game.player.type != SHIELD_TYPE:
+                    game.player.image = DINO_DEAD
+                    game.player.die_sound.play()
+                    game.draw()
                     pygame.time.delay(2000)
                     game.death_count += 1
                     game.playing = False
                     break
                 else:
                     self.obstacles.remove(obstacle)
-        
+            for hammer in game.player.hammers:
+                if hammer.image_rect.colliderect(obstacle.rect):
+                    game.player.hammers.remove(hammer)
+                    self.obstacles.remove(obstacle)
+        #actualizar las nubes
         for cloud in self.clouds:
             cloud.update(game.game_speed, self.clouds)
 
@@ -59,5 +68,6 @@ class ObstacleManager:
             obstacle.draw(screen)
     
     def reset_obstacles(self):
+        #volver al principio
         self.obstacles = []
         self.obstacle_counter = 0

@@ -1,6 +1,6 @@
 import pygame
 
-from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, FONT_STYLE, DEFAULT_TYPE
+from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, FONT_STYLE, DEFAULT_TYPE, MUSIC
 from dino_runner.components.dinosaur import Dinosaur
 from dino_runner.components.menu import Menu
 from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
@@ -11,6 +11,8 @@ class Game:
     GAME_SPEED = 20
     def __init__(self):
         pygame.init()
+        pygame.mixer.music.load(MUSIC)
+        pygame.mixer.music.set_volume(0.4)
         pygame.display.set_caption(TITLE)
         pygame.display.set_icon(ICON)
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -40,7 +42,9 @@ class Game:
         pygame.quit()
 
     def run(self):
+        pygame.mixer.music.play(-1)
         self.obstacle_manager.reset_obstacles()
+        self.power_up_manager.reset()
         self.player.reset_dinosaur()
         self.score = 0
         self.background_color = 255
@@ -54,6 +58,7 @@ class Game:
             self.update()
             self.draw()
             self.update_background()
+        pygame.mixer.music.stop()
 
     def events(self):
         for event in pygame.event.get():
@@ -96,7 +101,7 @@ class Game:
         if self.death_count > 0:
             self.highest_score = max(self.score, self.highest_score)
             self.menu.show_status(self.score, self.highest_score, self.death_count, self.screen)
-            self.menu.update_message(f'Game over. Press any key to restart.')
+            self.menu.update_message(f'Press any key to restart...')
         
         self.menu.draw(self.screen)    
             
@@ -107,7 +112,7 @@ class Game:
         self.score += 1
 
         if self.score % 100 == 0 and self.game_speed < 500:
-            self.game_speed += 2
+            self.game_speed += 1
 
     def draw_score(self):
         font = pygame.font.Font(FONT_STYLE, 24)
@@ -118,7 +123,7 @@ class Game:
 
     def update_background(self):
         self.background_color_count +=1
-        if self.background_color_count > 200:
+        if self.background_color_count > 1000:
             self.background_color_count = 0
             self.background_dark = False if self.background_dark else True
     
@@ -129,14 +134,16 @@ class Game:
 
     def draw_power_up_time(self):
         if self.player.has_power_up:
-            time_to_show = round((self.player.power_time_up - pygame.time.get_ticks()) / 1000, 2)
+            time_to_show = self.player.power_time_up
+            self.player.power_time_up -= 0.05
 
             if time_to_show >= 0:
                 font = pygame.font.Font(FONT_STYLE, 24)
-                text = font.render(f'{self.player.type} enabled for {time_to_show} seconds', False, (0,0,0), (255,255,255))
+                text = font.render(f'{self.player.type} enabled for {int(time_to_show)} seconds', False, (0,0,0), (255,255,255))
                 text_rect = text.get_rect()
                 text_rect.bottomleft = (200, 50)
                 self.screen.blit(text, text_rect)
             else:
                 self.player.has_power_up = False
+                self.player.power_time_up = 0
                 self.player.type = DEFAULT_TYPE
