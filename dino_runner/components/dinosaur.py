@@ -2,7 +2,7 @@ import pygame
 
 from pygame.sprite import Sprite
 from dino_runner.components.power_ups.hammer_throw import HammerThrow
-from dino_runner.utils.constants import RUNNING, DUCKING, JUMPING, DEFAULT_TYPE, SHIELD_TYPE, HAMMER_TYPE, RUNNING_SHIELD, JUMPING_SHIELD, DUCKING_SHIELD, RUNNING_HAMMER, JUMPING_HAMMER, DUCKING_HAMMER, JUMP_SOUND, THROW_SOUND, DIE_SOUND, POWER_UP_SOUND
+from dino_runner.utils.constants import RUNNING, DUCKING, JUMPING, DEFAULT_TYPE, SHIELD_TYPE, HAMMER_TYPE, RUNNING_SHIELD, JUMPING_SHIELD, DUCKING_SHIELD, RUNNING_HAMMER, JUMPING_HAMMER, DUCKING_HAMMER, JUMP_SOUND, THROW_SOUND, DIE_SOUND, POWER_UP_SOUND, HEART, LESS_HEART_SOUND
 
 RUN_IMG = {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD, HAMMER_TYPE: RUNNING_HAMMER}
 JUMP_IMG = {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD, HAMMER_TYPE: JUMPING_HAMMER}
@@ -23,6 +23,8 @@ class Dinosaur(Sprite):
         self.die_sound.set_volume(0.6)
         self.power_up_sound = pygame.mixer.Sound(POWER_UP_SOUND)
         self.power_up_sound.set_volume(0.6)
+        self.less_heart_sound = pygame.mixer.Sound(LESS_HEART_SOUND)
+        self.less_heart_sound.set_volume(0.6)
         self.type = DEFAULT_TYPE
         self.image = RUN_IMG[self.type][0]
         self.dino_rect = self.image.get_rect()
@@ -36,6 +38,7 @@ class Dinosaur(Sprite):
         self.power_time_up = 0
         self.hammers = []
         self.can_throw = 0
+        self.hearts = 5
     
     def update(self, user_input):
         # acciones por teclado
@@ -94,6 +97,9 @@ class Dinosaur(Sprite):
         self.dino_rect.w -= 50
         self.dino_rect.h -= 40
         #screen.fill((255, 0, 255), self.dino_rect)
+        for heart in range(0, self.hearts +1):
+            screen.blit(HEART, (25 + (heart * 30), 30)) 
+
         for hammer in self.hammers:
             hammer.draw(screen)
     
@@ -106,6 +112,7 @@ class Dinosaur(Sprite):
         self.in_jump = False
         self.has_power_up = False
         self.power_time_up = 0
+        self.hearts = 5
 
     def throw_hammer(self):
         hammer = HammerThrow(self.dino_rect_x +20, self.dino_rect_y + 20)

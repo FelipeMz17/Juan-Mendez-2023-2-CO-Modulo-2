@@ -77,6 +77,7 @@ JUMP_SOUND = (os.path.join(IMG_DIR, 'Other/smb_jump-super.wav'))
 THROW_SOUND = (os.path.join(IMG_DIR, 'Other/smb_kick.wav'))
 DIE_SOUND = (os.path.join(IMG_DIR, 'Other/smb_mariodie.wav'))
 POWER_UP_SOUND = (os.path.join(IMG_DIR, 'Other/smb_1-up.wav'))
+LESS_HEART_SOUND = (os.path.join(IMG_DIR, 'Other/smb_breakblock.wav'))
 
 FONT_STYLE = 'freesansbold.ttf'
 

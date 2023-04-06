@@ -37,13 +37,18 @@ class ObstacleManager:
             if game.player.dino_rect.colliderect(obstacle.rect):
                 # GAME OVER
                 if game.player.type != SHIELD_TYPE:
-                    game.player.image = DINO_DEAD
-                    game.player.die_sound.play()
-                    game.draw()
-                    pygame.time.delay(2000)
-                    game.death_count += 1
-                    game.playing = False
-                    break
+                    if game.player.hearts == 0:
+                        game.player.image = DINO_DEAD
+                        game.player.die_sound.play()
+                        game.draw()
+                        pygame.time.delay(2000)
+                        game.death_count += 1
+                        game.playing = False
+                        break
+                    else:
+                        game.player.hearts -= 1
+                        self.obstacles.remove(obstacle)
+                        game.player.less_heart_sound.play()
                 else:
                     self.obstacles.remove(obstacle)
             for hammer in game.player.hammers:
