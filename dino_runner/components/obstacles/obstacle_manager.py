@@ -39,7 +39,10 @@ class ObstacleManager:
                 if game.player.type != SHIELD_TYPE:
                     if game.player.hearts == 0:
                         game.player.image = DINO_DEAD
+                        #el dinosaurio no se baja del suelo al morir
+                        game.player.dino_rect_y = game.player.Y_POS if game.player.dino_rect_y > game.player.Y_POS else game.player.dino_rect_y
                         game.player.die_sound.play()
+                        game.background_color = 255
                         game.draw()
                         pygame.time.delay(2000)
                         game.death_count += 1

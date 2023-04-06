@@ -1,6 +1,6 @@
 import pygame
 
-from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, FONT_STYLE, DEFAULT_TYPE, MUSIC
+from dino_runner.utils.constants import BG, ICON, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS, FONT_STYLE, DEFAULT_TYPE, MUSIC, GAME_OVER, RESET
 from dino_runner.components.dinosaur import Dinosaur
 from dino_runner.components.menu import Menu
 from dino_runner.components.obstacles.obstacle_manager import ObstacleManager
@@ -12,7 +12,7 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.mixer.music.load(MUSIC)
-        pygame.mixer.music.set_volume(0.4)
+        pygame.mixer.music.set_volume(0.3)
         pygame.display.set_caption(TITLE)
         pygame.display.set_icon(ICON)
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -102,10 +102,12 @@ class Game:
             self.highest_score = max(self.score, self.highest_score)
             self.menu.show_status(self.score, self.highest_score, self.death_count, self.screen)
             self.menu.update_message(f'Press any key to restart...')
+            self.screen.blit(GAME_OVER, (half_screen_width - 200, half_screen_height - 200))
+            self.screen.blit(RESET, (half_screen_width - 50, half_screen_height + 200))
         
         self.menu.draw(self.screen)    
             
-        self.screen.blit(ICON, (half_screen_width - 50, half_screen_height - 140))
+        self.screen.blit(ICON, (half_screen_width - 40, half_screen_height - 140))
         self.menu.update(self)
     
     def update_score(self):
@@ -123,7 +125,7 @@ class Game:
 
     def update_background(self):
         self.background_color_count +=1
-        if self.background_color_count > 1000:
+        if self.background_color_count > 800:
             self.background_color_count = 0
             self.background_dark = False if self.background_dark else True
     
@@ -138,10 +140,11 @@ class Game:
             self.player.power_time_up -= 0.05
 
             if time_to_show >= 0:
+                self.screen.fill((150,150,150), (350, 30, (time_to_show * 20), 26))
                 font = pygame.font.Font(FONT_STYLE, 24)
-                text = font.render(f'{self.player.type} enabled for {int(time_to_show)} seconds', False, (0,0,0), (255,255,255))
+                text = font.render(f'{self.player.type.upper()} :', False, (0,0,0), (255,255,255))
                 text_rect = text.get_rect()
-                text_rect.bottomleft = (200, 50)
+                text_rect.bottomright = (350, 55)
                 self.screen.blit(text, text_rect)
             else:
                 self.player.has_power_up = False

@@ -2,7 +2,7 @@ import pygame
 
 from pygame.sprite import Sprite
 from dino_runner.components.power_ups.hammer_throw import HammerThrow
-from dino_runner.utils.constants import RUNNING, DUCKING, JUMPING, DEFAULT_TYPE, SHIELD_TYPE, HAMMER_TYPE, RUNNING_SHIELD, JUMPING_SHIELD, DUCKING_SHIELD, RUNNING_HAMMER, JUMPING_HAMMER, DUCKING_HAMMER, JUMP_SOUND, THROW_SOUND, DIE_SOUND, POWER_UP_SOUND, HEART, LESS_HEART_SOUND
+from dino_runner.utils.constants import RUNNING, DUCKING, JUMPING, DEFAULT_TYPE, SHIELD_TYPE, HAMMER_TYPE, RUNNING_SHIELD, JUMPING_SHIELD, DUCKING_SHIELD, RUNNING_HAMMER, JUMPING_HAMMER, DUCKING_HAMMER, JUMP_SOUND, THROW_SOUND, DIE_SOUND, POWER_UP_SOUND, HEART, LESS_HEART_SOUND, SCREEN_WIDTH
 
 RUN_IMG = {DEFAULT_TYPE: RUNNING, SHIELD_TYPE: RUNNING_SHIELD, HAMMER_TYPE: RUNNING_HAMMER}
 JUMP_IMG = {DEFAULT_TYPE: JUMPING, SHIELD_TYPE: JUMPING_SHIELD, HAMMER_TYPE: JUMPING_HAMMER}
@@ -16,15 +16,15 @@ class Dinosaur(Sprite):
 
     def __init__(self):
         self.jump_sound = pygame.mixer.Sound(JUMP_SOUND)
-        self.jump_sound.set_volume(0.8)
+        self.jump_sound.set_volume(0.6)
         self.throw_sound = pygame.mixer.Sound(THROW_SOUND)
-        self.throw_sound.set_volume(0.8)
+        self.throw_sound.set_volume(0.6)
         self.die_sound = pygame.mixer.Sound(DIE_SOUND)
-        self.die_sound.set_volume(0.6)
+        self.die_sound.set_volume(0.4)
         self.power_up_sound = pygame.mixer.Sound(POWER_UP_SOUND)
-        self.power_up_sound.set_volume(0.6)
+        self.power_up_sound.set_volume(0.5)
         self.less_heart_sound = pygame.mixer.Sound(LESS_HEART_SOUND)
-        self.less_heart_sound.set_volume(0.6)
+        self.less_heart_sound.set_volume(0.5)
         self.type = DEFAULT_TYPE
         self.image = RUN_IMG[self.type][0]
         self.dino_rect = self.image.get_rect()
@@ -46,9 +46,13 @@ class Dinosaur(Sprite):
             if user_input[pygame.K_SPACE]:
                 self.throw_sound.play()
                 self.throw_hammer()
-                self.can_throw = 40
+                self.can_throw = 30
         else:
             self.can_throw -= 1
+        
+        #sumar o restar la posicion horizontal con las teclas de los lados
+        self.dino_rect_x += (user_input[pygame.K_RIGHT] * 5) if self.dino_rect_x + self.dino_rect.h < SCREEN_WIDTH else 0
+        self.dino_rect_x -= (user_input[pygame.K_LEFT] * 5) if self.dino_rect_x > 0 else 0
 
         if self.in_jump:
             if user_input[pygame.K_DOWN]:
@@ -98,15 +102,20 @@ class Dinosaur(Sprite):
         self.dino_rect.h -= 40
         #screen.fill((255, 0, 255), self.dino_rect)
         for heart in range(0, self.hearts +1):
-            screen.blit(HEART, (25 + (heart * 30), 30)) 
+            heart_rect = HEART.get_rect()
+            heart_rect.x = 25 + (heart * 30)
+            heart_rect.y = 30
+            screen.fill((255, 255, 255), heart_rect)
+            screen.blit(HEART, heart_rect)
 
         for hammer in self.hammers:
             hammer.draw(screen)
     
     def reset_dinosaur(self):
         #volver al principio
-        self.image = RUN_IMG[self.type][0]
+        self.type = DEFAULT_TYPE
         self.dino_rect_y = self.Y_POS
+        self.dino_rect_x = self.X_POS
         self.time_animation = 0
         self.jump_speed = -10
         self.in_jump = False
